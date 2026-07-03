@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEIC 750 學習工具</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>TOEIC 750 學習工具</h1>
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard">儀表板</button>
+      <button class="tab-btn" data-tab="vocab">每日單字</button>
+      <button class="tab-btn" data-tab="mock">模考</button>
+      <button class="tab-btn" data-tab="review">錯題本</button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <div id="view-dashboard" class="view active"></div>
+    <div id="view-vocab" class="view"></div>
+    <div id="view-mock" class="view"></div>
+    <div id="view-review" class="view"></div>
+  </main>
+
+  <footer class="app-footer">
+    <p>資料僅儲存在你目前瀏覽器的 localStorage,不會上傳到任何伺服器。</p>
+  </footer>
+
+  <script src="js/vocab-data.js"></script>
+  <script src="js/grammar-data.js"></script>
+  <script src="js/reading-data.js"></script>
+  <script src="js/plan-data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/vocab-quiz.js"></script>
+  <script src="js/mock-test.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/review.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+name = "toeic-ielts-study-worker"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+# 部署前請務必修改下面 [vars] 區塊,細節見 docs/DEPLOYMENT.md
+[vars]
+# 你的 GitHub Pages 網址(前端唯一允許呼叫本 Worker 的來源),例如:
+# "https://zero4ledimage.github.io"
+ALLOWED_ORIGIN = "https://REPLACE_WITH_YOUR_GITHUB_USERNAME.github.io"
+
+# 只有用這個 Google 帳號登入的請求才能呼叫本 Worker(防止 Worker 網址外流後被他人濫用你的 AI 預算)
+# 已預填你的 Email,如果你想改用別的 Google 帳號登入這個工具,改這裡即可
+ALLOWED_EMAIL = "REPLACE_WITH_YOUR_LOGIN_EMAIL"
+
+# ANTHROPIC_API_KEY 不要寫在這個檔案裡!必須用 `wrangler secret put ANTHROPIC_API_KEY` 指令另外設定,
+# 這樣金鑰只會存在 Cloudflare 伺服器端,不會出現在這份會被 commit 進 git 的設定檔中。
+
+[[kv_namespaces]]
+binding = "USAGE_KV"
+# 執行 `wrangler kv namespace create USAGE_KV` 後,把回傳的 id 貼在這裡
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"

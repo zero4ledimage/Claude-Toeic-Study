@@ -1,0 +1,6 @@
+# ECDICT 原始資料檔案很大(約 66MB),不 commit 進 git。
+# 執行 scripts/convert-ecdict.js 前請先下載到這個路徑,見該檔案開頭的說明。
+data/dictionary/ecdict-raw.csv
+
+node_modules/
+.DS_Store

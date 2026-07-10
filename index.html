@@ -3,40 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TOEIC 750 學習工具</title>
+  <title>多益雅思學習工具</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header class="app-header">
-    <h1>TOEIC 750 學習工具</h1>
+    <div class="app-header-top">
+      <h1>多益雅思學習工具</h1>
+      <div id="auth-area" class="auth-area"></div>
+    </div>
+    <div id="setup-warning" class="setup-warning" style="display:none;"></div>
     <nav class="tab-nav">
       <button class="tab-btn active" data-tab="dashboard">儀表板</button>
-      <button class="tab-btn" data-tab="vocab">每日單字</button>
-      <button class="tab-btn" data-tab="mock">模考</button>
-      <button class="tab-btn" data-tab="review">錯題本</button>
+      <button class="tab-btn" data-tab="vocab">每日複習</button>
+      <button class="tab-btn" data-tab="decomposer">拆解器</button>
+      <button class="tab-btn" data-tab="error-log">錯題本</button>
+      <button class="tab-btn" data-tab="writing">寫作</button>
+      <button class="tab-btn" data-tab="speaking">口說</button>
+      <button class="tab-btn" data-tab="mock-schedule">模考排程</button>
     </nav>
+    <div id="scheduler-banner-container"></div>
   </header>
 
   <main class="app-main">
     <div id="view-dashboard" class="view active"></div>
     <div id="view-vocab" class="view"></div>
-    <div id="view-mock" class="view"></div>
-    <div id="view-review" class="view"></div>
+    <div id="view-decomposer" class="view"></div>
+    <div id="view-error-log" class="view"></div>
+    <div id="view-writing" class="view"></div>
+    <div id="view-speaking" class="view"></div>
+    <div id="view-mock-schedule" class="view"></div>
   </main>
 
   <footer class="app-footer">
-    <p>資料僅儲存在你目前瀏覽器的 localStorage,不會上傳到任何伺服器。</p>
+    <p>學習資料存放在你自己的 Google Drive(需登入),AI 功能透過你自己部署的 Cloudflare Worker 呼叫。詳見 <a href="docs/DEPLOYMENT.md">部署手冊</a>。</p>
   </footer>
 
-  <script src="js/vocab-data.js"></script>
-  <script src="js/grammar-data.js"></script>
-  <script src="js/reading-data.js"></script>
-  <script src="js/plan-data.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/vocab-quiz.js"></script>
-  <script src="js/mock-test.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data-store.js"></script>
+  <script src="js/drive-sync.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/fsrs.js"></script>
+  <script src="js/vocab-lookup.js"></script>
+  <script src="js/vocab-review.js"></script>
+  <script src="js/decomposer.js"></script>
+  <script src="js/error-log.js"></script>
   <script src="js/dashboard.js"></script>
-  <script src="js/review.js"></script>
+  <script src="js/scheduler.js"></script>
+  <script src="js/writing-sandbox.js"></script>
+  <script src="js/speaking.js"></script>
+  <script src="js/mock-schedule.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

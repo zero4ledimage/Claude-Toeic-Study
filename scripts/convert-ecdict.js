@@ -7,8 +7,14 @@
  *      curl -o data/dictionary/ecdict-raw.csv \
  *        https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv
  *      (這個原始檔案很大,不會 commit 進 git,已加入 .gitignore)
- *   2. 執行: node scripts/convert-ecdict.js
- *   3. 產出: data/dictionary/dict-subset.json(約 15,000-20,000 字的精簡子集,含 KK 音標)
+ *   2. 在 repo 根目錄執行 npm install(安裝 opencc-js,簡轉繁用)
+ *   3. 執行: node scripts/convert-ecdict.js
+ *   4. 產出: data/dictionary/dict-subset.json(約 15,000-20,000 字的精簡子集,含 KK 音標)
+ *
+ * 中文釋義處理:ECDICT 是中國大陸專案,釋義為簡體中文。這裡用 OpenCC 的
+ * cn→twp 模式一次性轉成台灣正體(twp 除了字形轉換,還會把大陸慣用語彙換成
+ * 台灣慣用語,例如 内存→記憶體、软件→軟體),轉換發生在建置期,前端載入的
+ * JSON 已是正體,執行期零成本。
  *
  * ============================================================
  * 關於 IPA/DJ → KK 音標轉換的重要說明(寫給日後維護者,也已同步告知使用者):
@@ -43,6 +49,15 @@
 
 const fs = require("fs");
 const path = require("path");
+
+let toTraditional;
+try {
+  const OpenCC = require("opencc-js");
+  toTraditional = OpenCC.Converter({ from: "cn", to: "twp" });
+} catch (e) {
+  console.error("找不到 opencc-js,請先在 repo 根目錄執行 npm install(見本檔案開頭的使用說明)。");
+  process.exit(1);
+}
 
 const RAW_PATH = path.join(__dirname, "..", "data", "dictionary", "ecdict-raw.csv");
 const OUT_PATH = path.join(__dirname, "..", "data", "dictionary", "dict-subset.json");
@@ -102,8 +117,12 @@ const PLACEHOLDER_RULES = [
   [/ə:|ɜ:?/g, "§NURSE§"],
   [/ɒ:|ɔ:/g, "§THOUGHT§"],
   [/ɑ:/g, "§PALM§"],
-  [/eə/g, "§SQUARE§"],
+  [/eə|ɛə/g, "§SQUARE§"], // ɛə:資料裡的 ε/є 變體在步驟1已正規化為 ɛ,這裡要一併吃掉
+  // ascii 寫法的 iə/uə 只在後面跟著 r(連音 r)時才視為 NEAR/CURE 雙母音,
+  // 否則像 schedule 的 'skedʒuәl 這種真正的 u+ə 序列會被誤傷
+  [/(?:ɪə|iə)(?=r)/g, "§NEAR§"],
   [/ɪə/g, "§NEAR§"],
+  [/(?:ʊə|uə)(?=r)/g, "§CURE§"],
   [/ʊə/g, "§CURE§"],
   [/ɒi|ɔɪ|ɔi/g, "§CHOICE§"],
   [/eɪ|ei/g, "§FACE§"],
@@ -118,8 +137,12 @@ const PLACEHOLDER_RESOLVE = (word) => [
   [/§NURSE§/g, "ɝ"],
   [/§THOUGHT§/g, "ɔ"],
   [/§PALM§/g, BATH_WORDS.has(word.toLowerCase()) ? "æ" : "ɑ"],
+  // SQUARE/NEAR/CURE 資料裡常已帶連音 r(如 vɛəriəs),後面已有 r 時只轉母音,避免疊字
+  [/§SQUARE§(?=r)/g, "ɛ"],
   [/§SQUARE§/g, "ɛr"],
+  [/§NEAR§(?=r)/g, "ɪ"],
   [/§NEAR§/g, "ɪr"],
+  [/§CURE§(?=r)/g, "ʊ"],
   [/§CURE§/g, "ʊr"],
   [/§CHOICE§/g, "ɔɪ"],
   [/§FACE§/g, "e"],
@@ -231,7 +254,7 @@ function main() {
     const meaning = firstMeaning(row.translation);
     if (!meaning) continue;
 
-    out[row.word.toLowerCase()] = { word: row.word, kk, meaning };
+    out[row.word.toLowerCase()] = { word: row.word, kk, meaning: toTraditional(meaning) };
     included++;
   }
 

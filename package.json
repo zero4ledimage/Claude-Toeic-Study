@@ -1,0 +1,11 @@
+{
+  "name": "toeic-ielts-study-tool",
+  "private": true,
+  "description": "個人化英語學習工具(前端為純靜態網站,此 package.json 只供 scripts/ 下的資料處理腳本使用)",
+  "scripts": {
+    "build-dict": "node scripts/convert-ecdict.js"
+  },
+  "devDependencies": {
+    "opencc-js": "^1.0.5"
+  }
+}

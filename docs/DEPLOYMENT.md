@@ -46,12 +46,13 @@
 
 ### 步驟 5:設定環境變數與金鑰
 
-同樣在 **Settings** → **Variables and Secrets** 頁面,新增以下三個變數:
+同樣在 **Settings** → **Variables and Secrets** 頁面,新增以下四個變數:
 
 | 變數名稱 | 類型 | 值 |
 |---|---|---|
-| `ALLOWED_ORIGIN` | 一般文字(Text) | 你的 GitHub Pages 網址,例如 `https://zero4ledimage.github.io`(等 Part 3 啟用 GitHub Pages 後確認實際網址,現在可以先填這個猜測值,之後再回來改) |
-| `ALLOWED_EMAIL` | 一般文字(Text) | `REPLACE_WITH_YOUR_LOGIN_EMAIL`(限定只有用這個 Google 帳號登入本工具的請求才能呼叫 AI,防止 Worker 網址外流後被別人盜用你的預算) |
+| `ALLOWED_ORIGIN` | 一般文字(Text) | 你的 GitHub Pages 網址,例如 `https://你的帳號.github.io`(等 Part 3 啟用 GitHub Pages 後確認實際網址,現在可以先填這個猜測值,之後再回來改) |
+| `ALLOWED_EMAIL` | 一般文字(Text) | 你要用來登入本工具的 Google 帳號 Email(限定只有這個帳號登入的請求才能呼叫 AI,防止 Worker 網址外流後被別人盜用你的預算) |
+| `GOOGLE_CLIENT_ID` | 一般文字(Text) | 你在 Part 2 建立的 OAuth Client ID(格式 `xxxx.apps.googleusercontent.com`)。Worker 會驗證呼叫端的 Google token 確實是發給這個 Client ID 的,擋掉你授權過的其他第三方應用拿它們的 token 來盜用預算。可以等 Part 2 完成後再回來填 |
 | `ANTHROPIC_API_KEY` | **⚠️ 一定要選「Encrypt」(加密/Secret)類型** | 你的 Anthropic API 金鑰,從 https://console.anthropic.com/settings/keys 取得(如果還沒有帳號,先去 https://console.anthropic.com 註冊並加值) |
 
 **⚠️ 重要**:`ANTHROPIC_API_KEY` 這一個一定要選加密類型(Cloudflare 介面上通常標示為 "Encrypt" 或有一個鎖頭圖示可切換),存好之後 Cloudflare 自己都不會再顯示明碼給你看。如果不小心選成一般文字類型,等於金鑰還是變相公開在你的 Cloudflare 帳號設定畫面上,雖然不會外流到前端,但仍建議務必用加密類型。
@@ -98,7 +99,7 @@ https://toeic-ielts-study-worker.你的cloudflare帳號子網域.workers.dev
 ### 步驟 1:建立 Google Cloud 專案
 
 1. 前往 https://console.cloud.google.com/
-2. 用你平常的 Google 帳號登入(建議用 `REPLACE_WITH_YOUR_LOGIN_EMAIL`,跟後面 Worker 設定的 `ALLOWED_EMAIL` 要一致)
+2. 用你平常的 Google 帳號登入(要跟後面 Worker 設定的 `ALLOWED_EMAIL` 是同一個帳號)
 3. 上方選單點專案下拉選單 → **新增專案**
 4. 專案名稱建議填:`toeic-ielts-study-tool`,建立
 
@@ -112,8 +113,8 @@ https://toeic-ielts-study-worker.你的cloudflare帳號子網域.workers.dev
 1. **API 和服務** → **OAuth 同意畫面**
 2. User Type 選 **External**(外部)
 3. 填寫應用程式名稱(例如「多益雅思學習工具」)、你的 Email(使用者支援 Email 與開發人員聯絡資訊都填你自己的 Email)
-4. **範圍(Scopes)**這一步先跳過或不用特別新增,實際授權範圍會在程式碼裡直接指定 `drive.file`
-5. **測試使用者(Test users)**這一步:點新增使用者,加入 `REPLACE_WITH_YOUR_LOGIN_EMAIL`(你自己的帳號)
+4. **範圍(Scopes)**這一步先跳過或不用特別新增,實際授權範圍會在程式碼裡直接指定(`drive.file` 加上取得 Email 用的 `openid`、`email`)
+5. **測試使用者(Test users)**這一步:點新增使用者,加入你自己要用來登入的 Google 帳號 Email
    - 這一步很重要:因為這個 OAuth 應用停留在「測試中」狀態(個人工具不需要走 Google 正式審核),只有列在測試使用者名單裡的帳號才能登入成功
 6. 儲存並繼續,完成設定
 

@@ -13,7 +13,9 @@
 const CONFIG = {
   WORKER_URL: "https://REPLACE_WITH_YOUR_WORKER_URL.workers.dev",
   GOOGLE_CLIENT_ID: "REPLACE_WITH_YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
-  DRIVE_SCOPE: "https://www.googleapis.com/auth/drive.file",
+  // drive.file:只能存取本工具自己建立的檔案(較安全)
+  // openid email:讓取得的 access token 帶有帳號 email,Worker 才能驗證呼叫者身分(見 worker/src/index.js)
+  DRIVE_SCOPE: "openid email https://www.googleapis.com/auth/drive.file",
   DRIVE_FOLDER_NAME: "TOEIC-IELTS-Study-Data",
 
   MODELS: {

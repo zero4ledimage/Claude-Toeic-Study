@@ -154,7 +154,7 @@ const Dashboard = {
       .map(
         (s) => `
       <div class="chart-row">
-        <span class="chart-row-label">${s.category}</span>
+        <span class="chart-row-label">${escapeHtml(s.category)}</span>
         <div class="chart-bar-track"><div class="chart-bar weakness-bar" style="width:${(s.count / max) * 100}%"></div></div>
         <span class="chart-row-value">${s.count} 次</span>
       </div>`

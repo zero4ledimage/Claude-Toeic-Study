@@ -38,8 +38,9 @@ const VocabReview = {
       return;
     }
     const item = this.queue[this.index];
+    // 先挖空、再整段跳脫,確保情境句(可能源自 AI 輸出或貼上的文章)不會夾帶可執行 HTML
     const blanked = item.source_sentence
-      ? item.source_sentence.replace(new RegExp(escapeRegExp(item.word), "gi"), "____")
+      ? escapeHtml(item.source_sentence.replace(new RegExp(escapeRegExp(item.word), "gi"), "____"))
       : "(沒有情境句)";
 
     this.container.innerHTML = `
@@ -50,9 +51,9 @@ const VocabReview = {
           ${this.revealed
             ? `
             <div class="rc-back">
-              <p class="rc-word">${item.word} ${item.phonetic ? `<span class="pos">[${item.phonetic}]</span>` : ""}</p>
-              <p class="rc-meaning">${item.definition}</p>
-              ${item.source_sentence ? `<p class="muted">${item.source_sentence}</p>` : ""}
+              <p class="rc-word">${escapeHtml(item.word)} ${item.phonetic ? `<span class="pos">[${escapeHtml(item.phonetic)}]</span>` : ""}</p>
+              <p class="rc-meaning">${escapeHtml(item.definition)}</p>
+              ${item.source_sentence ? `<p class="muted">${escapeHtml(item.source_sentence)}</p>` : ""}
             </div>
             <div class="rc-grades">
               <button class="rc-grade-btn rc-again" data-grade="1">忘記了</button>

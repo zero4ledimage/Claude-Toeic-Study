@@ -63,15 +63,23 @@ function dayKey(date) {
   return date.toISOString().slice(0, 10); // "2026-07-10"
 }
 
-async function verifyGoogleAccessToken(accessToken, allowedEmail) {
+async function verifyGoogleAccessToken(accessToken, env) {
   if (!accessToken) return false;
   try {
-    const resp = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+    // 用 tokeninfo 端點(而非 userinfo),因為它會回傳 token 的 audience(aud):
+    // 也就是「這個 token 是發給哪個 OAuth 應用的」。只驗證 email 不夠——使用者授權過的
+    // 任何第三方 Google 應用拿到的 token 也屬於同一個 email,若不比對 aud,那些 token
+    // 也能通過驗證來盜用本 Worker 的 AI 預算(confused deputy)。這裡要求 aud 必須等於
+    // 我們自己的 OAuth Client ID,確保 token 是本工具的前端簽發的。
+    const resp = await fetch(
+      "https://oauth2.googleapis.com/tokeninfo?access_token=" + encodeURIComponent(accessToken)
+    );
     if (!resp.ok) return false;
     const info = await resp.json();
-    return info.email === allowedEmail && info.email_verified;
+    const emailOk = info.email === env.ALLOWED_EMAIL && (info.email_verified === true || info.email_verified === "true");
+    // Google 對 access token 的 tokeninfo,client ID 可能出現在 aud 或 azp,兩者接受其一即可
+    const audOk = !env.GOOGLE_CLIENT_ID || info.aud === env.GOOGLE_CLIENT_ID || info.azp === env.GOOGLE_CLIENT_ID;
+    return emailOk && audOk;
   } catch (e) {
     return false;
   }
@@ -139,6 +147,11 @@ async function handleMessages(request, env, origin) {
   }
   if (!body.model || !body.messages) {
     return json({ error: "missing_model_or_messages" }, 400, origin, env.ALLOWED_ORIGIN);
+  }
+  // 拒絕串流回應:串流是 SSE 格式,下面用 resp.json() 會解析失敗而略過用量記錄,
+  // 但 Anthropic 仍照常計費,等於繞過 USD 30 硬上限。本工具的功能都不需要串流,直接擋掉。
+  if (body.stream) {
+    return json({ error: "stream_not_supported", message: "本中介層不支援串流回應。" }, 400, origin, env.ALLOWED_ORIGIN);
   }
 
   const anthropicResp = await fetch(ANTHROPIC_API_URL, {
@@ -217,7 +230,7 @@ export default {
 
     const authHeader = request.headers.get("Authorization") || "";
     const accessToken = authHeader.replace(/^Bearer\s+/i, "");
-    const authorized = await verifyGoogleAccessToken(accessToken, env.ALLOWED_EMAIL);
+    const authorized = await verifyGoogleAccessToken(accessToken, env);
     if (!authorized) {
       return json({ error: "unauthorized", message: "請先用授權的 Google 帳號登入。" }, 401, origin, env.ALLOWED_ORIGIN);
     }

@@ -117,7 +117,7 @@ const Decomposer = {
       const sentence = findSentence(v.word);
       const row = document.createElement("div");
       row.className = "extract-item";
-      row.innerHTML = `<strong>${v.word}</strong> — ${v.meaning} <button class="btn-secondary add-extract-btn">＋加入複習清單</button>`;
+      row.innerHTML = `<strong>${escapeHtml(v.word)}</strong> — ${escapeHtml(v.meaning)} <button class="btn-secondary add-extract-btn">＋加入複習清單</button>`;
       row.querySelector(".add-extract-btn").addEventListener("click", (e) => {
         DataStore.addVocabItem({
           word: v.word,
@@ -135,7 +135,7 @@ const Decomposer = {
     grammarPoints.forEach((g) => {
       const row = document.createElement("div");
       row.className = "extract-item";
-      row.innerHTML = `<strong>${g.pattern}</strong><p class="muted">${g.explanation}</p><button class="btn-secondary add-extract-btn">＋加入複習清單</button>`;
+      row.innerHTML = `<strong>${escapeHtml(g.pattern)}</strong><p class="muted">${escapeHtml(g.explanation)}</p><button class="btn-secondary add-extract-btn">＋加入複習清單</button>`;
       row.querySelector(".add-extract-btn").addEventListener("click", (e) => {
         DataStore.addVocabItem({
           word: g.pattern,
@@ -153,7 +153,7 @@ const Decomposer = {
     testPoints.forEach((t) => {
       const row = document.createElement("div");
       row.className = "extract-item";
-      row.innerHTML = `<strong>${t.point}</strong><p class="muted">${t.explanation}</p><button class="btn-secondary add-extract-btn">＋加入複習清單</button>`;
+      row.innerHTML = `<strong>${escapeHtml(t.point)}</strong><p class="muted">${escapeHtml(t.explanation)}</p><button class="btn-secondary add-extract-btn">＋加入複習清單</button>`;
       row.querySelector(".add-extract-btn").addEventListener("click", (e) => {
         DataStore.addVocabItem({
           word: t.point,

@@ -9,8 +9,15 @@ compatibility_date = "2026-07-01"
 ALLOWED_ORIGIN = "https://REPLACE_WITH_YOUR_GITHUB_USERNAME.github.io"
 
 # 只有用這個 Google 帳號登入的請求才能呼叫本 Worker(防止 Worker 網址外流後被他人濫用你的 AI 預算)
-# 已預填你的 Email,如果你想改用別的 Google 帳號登入這個工具,改這裡即可
+# 填你要用來登入這個工具的 Google 帳號 Email。
+# (這份檔案會 commit 進 public repo,所以這裡放佔位符,真正的值建議直接在 Cloudflare 後台的
+#  Variables 設定,或改用非公開帳號 Email,避免個資被爬蟲收去。)
 ALLOWED_EMAIL = "REPLACE_WITH_YOUR_LOGIN_EMAIL"
+
+# 你的 Google OAuth Client ID(與 js/config.js 的 GOOGLE_CLIENT_ID 同一個值)。
+# Worker 會驗證呼叫端的 Google token 確實是發給這個 Client ID 的,防止你授權過的其他
+# 第三方 Google 應用拿它們的 token 來盜用本 Worker 的預算。Client ID 本身不是機密。
+GOOGLE_CLIENT_ID = "REPLACE_WITH_YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com"
 
 # ANTHROPIC_API_KEY 不要寫在這個檔案裡!必須用 `wrangler secret put ANTHROPIC_API_KEY` 指令另外設定,
 # 這樣金鑰只會存在 Cloudflare 伺服器端,不會出現在這份會被 commit 進 git 的設定檔中。

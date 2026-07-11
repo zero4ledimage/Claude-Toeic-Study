@@ -74,7 +74,7 @@ const WritingSandbox = {
       this.container.querySelector("#ws-result").innerHTML = `
         <div class="card">
           <h3>批改結果</h3>
-          <div class="ws-feedback">${feedback.replace(/\n/g, "<br>")}</div>
+          <div class="ws-feedback">${escapeHtml(feedback).replace(/\n/g, "<br>")}</div>
         </div>
       `;
       statusEl.textContent = "";

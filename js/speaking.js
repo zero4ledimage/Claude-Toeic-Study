@@ -147,7 +147,7 @@ const SpeakingModule = {
       this.container.querySelector("#sp-result").innerHTML = `
         <div class="card">
           <h3>內容組織建議</h3>
-          <div class="ws-feedback">${feedback.replace(/\n/g, "<br>")}</div>
+          <div class="ws-feedback">${escapeHtml(feedback).replace(/\n/g, "<br>")}</div>
         </div>
       `;
       statusEl.textContent = "";

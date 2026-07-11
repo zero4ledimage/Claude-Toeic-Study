@@ -44,8 +44,8 @@ const VocabLookup = {
    * 並標記該單字所屬的完整句子(供加入單字清單時擷取情境句)。
    */
   wrapInteractiveText(text) {
-    const escapeHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const escapeAttr = (s) => escapeHtml(s).replace(/"/g, "&quot;");
+    // escapeHtml 已把 " ' < > & 都轉義,放進 HTML 屬性值也安全
+    const escapeAttr = (s) => escapeHtml(s);
 
     const sentences = text.match(/[^.!?\n]+[.!?]*|\n+/g) || [text];
     const wordRegex = /[A-Za-z]+(?:'[A-Za-z]+)?/g;
@@ -134,9 +134,9 @@ const VocabLookup = {
     const meaning = entry ? entry.meaning : "(字典中查無此字,可能是專有名詞或字典子集未收錄)";
 
     tip.innerHTML = `
-      <div class="vt-word">${entry ? entry.word : word}</div>
-      ${kk ? `<div class="vt-kk">[${kk}]</div>` : ""}
-      <div class="vt-meaning">${meaning}</div>
+      <div class="vt-word">${escapeHtml(entry ? entry.word : word)}</div>
+      ${kk ? `<div class="vt-kk">[${escapeHtml(kk)}]</div>` : ""}
+      <div class="vt-meaning">${escapeHtml(meaning)}</div>
       <div class="vt-actions">
         <button class="vt-add-btn">＋加入單字清單</button>
         <button class="vt-ai-btn">AI 情境用法說明</button>

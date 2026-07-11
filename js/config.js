@@ -11,7 +11,7 @@
  *  - GOOGLE_CLIENT_ID:完成 docs/DEPLOYMENT.md Part 2 後,把 OAuth Client ID 貼在這裡
  */
 const CONFIG = {
-  WORKER_URL: "https://REPLACE_WITH_YOUR_WORKER_URL.workers.dev",
+  WORKER_URL: "https://calm-morning-a2cf.cosmosskyocean0000.workers.dev",
   GOOGLE_CLIENT_ID: "REPLACE_WITH_YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
   // drive.file:只能存取本工具自己建立的檔案(較安全)
   // openid email:讓取得的 access token 帶有帳號 email,Worker 才能驗證呼叫者身分(見 worker/src/index.js)

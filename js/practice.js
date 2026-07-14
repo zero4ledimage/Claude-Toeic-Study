@@ -21,6 +21,19 @@ function prShuffle(arr) {
   return a;
 }
 
+// 把 ECDICT 字典的釋義清乾淨:去掉開頭詞性標記(a./vt./n.…)與 [計] 之類方括號註記,
+// 取前 1-2 個中文義,長度合理才回傳,否則回空字串(該字就不拿來出題)。
+function prCleanMeaning(raw) {
+  if (!raw) return "";
+  let m = String(raw).split(/[;；\r\n]/)[0].trim();
+  m = m.replace(/^(n|v|vt|vi|a|ad|adj|adv|prep|conj|pron|art|int|num|aux|abbr|pl)\.\s*/i, "");
+  m = m.replace(/\[[^\]]*\]/g, "").trim();
+  const parts = m.split(/[,，、]/).map((s) => s.trim()).filter(Boolean).slice(0, 2);
+  m = parts.join("、");
+  if (!/[一-鿿]/.test(m)) return "";
+  return m.length > 18 ? m.slice(0, 18) : m;
+}
+
 const Practice = {
   session: null, // 進行中的一組題目(drill 或 mock)
   _timer: null,
@@ -60,7 +73,7 @@ const Practice = {
           </select>
           <button class="btn-primary" id="pr-start-drill">開始練功</button>
         </div>
-        <p class="muted">單字題庫:你已收藏 ${savedVocab} 字 + 內建 ${PRACTICE_VOCAB.length} 字。收藏的字會優先出題。</p>
+        <p class="muted">單字題庫:你已收藏 ${savedVocab} 字 + 內建字庫(從本地字典約 1.7 萬字出題)。收藏的字會優先出題。</p>
       </div>
 
       <div class="card">
@@ -114,14 +127,42 @@ const Practice = {
   },
 
   // ---------------- 題目建構 ----------------
+  _dictPool: null,
+  // 從已載入的本地字典(21,666 詞條)建一個乾淨的單字題池(約 1.7 萬字),只建一次快取起來。
+  _buildDictPool() {
+    if (this._dictPool) return this._dictPool;
+    const dict = typeof VocabLookup !== "undefined" ? VocabLookup.dict : null;
+    if (!dict) return [];
+    const pool = [];
+    for (const key in dict) {
+      const e = dict[key];
+      const word = e.word || key;
+      if (!/^[a-z]+$/.test(word) || word.length < 3) continue; // 只要單一英文字、跳過過短功能詞
+      const meaning = prCleanMeaning(e.meaning);
+      if (!meaning) continue;
+      pool.push({ word, meaning, pos: "", example: "", phonetic: e.kk || "" });
+    }
+    this._dictPool = pool;
+    return pool;
+  },
+
+  // 若題型需要單字,確保字典已載入(async);其餘題型不需等待。
+  _ensureVocabReady(type) {
+    const needsVocab = type === "vocab" || type === "mixed";
+    if (needsVocab && typeof VocabLookup !== "undefined") return VocabLookup.loadDictionary();
+    return Promise.resolve();
+  },
+
   _vocabPool() {
     const saved = DataStore.getAll("vocabItems").map((v) => ({
       word: v.word, meaning: v.definition, pos: "", example: v.source_sentence || "", phonetic: v.phonetic || ""
     }));
     const seen = new Set(saved.map((v) => v.word.toLowerCase()));
     const seed = PRACTICE_VOCAB.filter((v) => !seen.has(v.word.toLowerCase()));
-    // 只取有中文釋義的字,才能出選擇題
-    return saved.filter((v) => v.meaning).concat(seed);
+    seed.forEach((v) => seen.add(v.word.toLowerCase()));
+    const dict = this._buildDictPool().filter((v) => !seen.has(v.word.toLowerCase()));
+    // 收藏的字 → 內建種子 → 字典(共約 1.7 萬字),前段優先個人化,整體出題時再隨機
+    return saved.filter((v) => v.meaning).concat(seed).concat(dict);
   },
 
   _buildVocabQuestions(n) {
@@ -210,7 +251,8 @@ const Practice = {
   },
 
   // ================= 每日練功 =================
-  _startDrill(type, count) {
+  async _startDrill(type, count) {
+    await this._ensureVocabReady(type);
     const questions = this._buildQuestions(type, count);
     if (questions.length === 0) {
       alert("目前可用題目不足,請改選其他題型或先用拆解器收藏一些單字。");

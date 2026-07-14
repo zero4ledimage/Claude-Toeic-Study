@@ -161,5 +161,113 @@ const PRACTICE_READING = [
       { q: "How long is the upgrade expected to take?", options: ["About two hours", "About six hours", "About twelve hours", "A full day"], answer: 1 },
       { q: "What should employees do to send urgent messages?", options: ["Use a personal email", "Contact the IT help desk", "Wait until Monday", "Visit the IT office"], answer: 1 }
     ]
+  },
+  {
+    title: "Conference Registration",
+    text: "Dear Ms. Patel,\n\nThank you for your interest in the Annual Marketing Summit on September 12. The standard registration fee is $250, but if you register before August 15, you will receive an early-bird discount of 20 percent. Your registration includes access to all sessions, lunch, and conference materials. To secure your place, please complete the online form and submit your payment through our website.\n\nBest regards,\nEvents Team",
+    questions: [
+      { q: "What must Ms. Patel do to get the discount?", options: ["Attend all sessions", "Register before August 15", "Pay in cash", "Bring a colleague"], answer: 1 },
+      { q: "What is NOT included in the registration?", options: ["Lunch", "Conference materials", "Hotel accommodation", "Access to all sessions"], answer: 2 },
+      { q: "How should payment be made?", options: ["By mail", "Through the website", "At the door", "By phone"], answer: 1 }
+    ]
+  },
+  {
+    title: "Cafeteria Notice",
+    text: "Attention Employees\n\nStarting next Monday, the staff cafeteria will extend its hours and open from 7:00 a.m. to 3:00 p.m., one hour later than before. A new salad bar will also be added to the menu. Please note that the cafeteria will no longer accept cash; payment must be made using your employee ID card, which can be loaded with funds at the machine near the entrance.",
+    questions: [
+      { q: "What change is being made to the cafeteria?", options: ["It will close earlier", "It will extend its hours", "It will move locations", "It will reduce its menu"], answer: 1 },
+      { q: "How must employees now pay?", options: ["With cash", "With their employee ID card", "By credit card only", "With a mobile app"], answer: 1 },
+      { q: "What is being added to the menu?", options: ["A coffee bar", "A salad bar", "A dessert counter", "A grill station"], answer: 1 }
+    ]
+  },
+  {
+    title: "Job Fair Announcement",
+    text: "The city's largest career fair will be held at the Riverside Convention Center on October 5 from 10 a.m. to 4 p.m. More than 80 companies from the technology, finance, and healthcare sectors will be recruiting for full-time and internship positions. Admission is free, but attendees are encouraged to register online in advance and bring several printed copies of their résumé. Professional attire is recommended.",
+    questions: [
+      { q: "How much does it cost to attend the fair?", options: ["$10", "$25", "It is free", "$50"], answer: 2 },
+      { q: "What are attendees encouraged to bring?", options: ["A laptop", "Printed copies of their résumé", "A business license", "Lunch"], answer: 1 },
+      { q: "Which sector is mentioned as recruiting?", options: ["Agriculture", "Healthcare", "Construction", "Education"], answer: 1 }
+    ]
+  },
+  {
+    title: "Product Launch",
+    text: "GreenTech Industries announced today that it will release its new line of energy-efficient office printers next month. The printers use up to 40 percent less electricity than previous models and are made partly from recycled materials. The company will offer a special introductory price to customers who place orders during the first two weeks after launch. A free maintenance plan will also be included for the first year.",
+    questions: [
+      { q: "What is special about the new printers?", options: ["They print in color", "They use less electricity", "They are wireless", "They are smaller"], answer: 1 },
+      { q: "Who will receive the introductory price?", options: ["All customers", "Customers who order in the first two weeks", "Only businesses", "Existing customers"], answer: 1 },
+      { q: "What is included for the first year?", options: ["Free ink", "A free maintenance plan", "Free delivery", "A cash rebate"], answer: 1 }
+    ]
+  },
+  {
+    title: "Booking Confirmation",
+    text: "Dear Mr. Osei,\n\nThis email confirms your reservation at the Grand Plaza Hotel for two nights, checking in on November 3 and checking out on November 5. You have booked a deluxe room with a city view. Check-in begins at 3:00 p.m. and check-out is at 11:00 a.m. A complimentary breakfast is served daily from 6:30 to 10:00 a.m. If you need to cancel, please do so at least 48 hours before arrival to avoid a charge.",
+    questions: [
+      { q: "How many nights will Mr. Osei stay?", options: ["One", "Two", "Three", "Four"], answer: 1 },
+      { q: "When does check-in begin?", options: ["11:00 a.m.", "1:00 p.m.", "3:00 p.m.", "6:30 a.m."], answer: 2 },
+      { q: "How can Mr. Osei avoid a cancellation charge?", options: ["Pay in advance", "Cancel at least 48 hours before arrival", "Call the front desk", "Book a cheaper room"], answer: 1 }
+    ]
+  },
+  {
+    title: "Team Building Invitation",
+    text: "To: Sales Department\nFrom: Human Resources\n\nYou are invited to our annual team-building day on Friday, August 22. This year's event will take place at Lakeside Park and will include outdoor games, a group cooking challenge, and a barbecue lunch. Transportation will be provided from the office at 9 a.m. Please let us know by August 15 whether you will attend and inform us of any dietary restrictions so we can plan the meals accordingly.",
+    questions: [
+      { q: "Where will the event take place?", options: ["At the office", "At Lakeside Park", "At a restaurant", "At a hotel"], answer: 1 },
+      { q: "What are employees asked to report?", options: ["Their shoe size", "Any dietary restrictions", "Their home address", "Their department"], answer: 1 },
+      { q: "How will employees get to the event?", options: ["By their own car", "Transportation from the office", "By train", "By taxi"], answer: 1 }
+    ]
+  },
+  {
+    title: "Parking Policy Update",
+    text: "Notice to All Staff\n\nDue to construction in the north parking lot, that lot will be closed from July 1 to July 30. During this period, employees may park in the south lot or in the public garage across the street, for which the company will cover the daily fee. To be reimbursed for garage parking, keep your receipts and submit them to the finance office at the end of the month. We apologize for the inconvenience.",
+    questions: [
+      { q: "Why is the north lot being closed?", options: ["For cleaning", "Due to construction", "For a private event", "Because of low usage"], answer: 1 },
+      { q: "What will the company cover?", options: ["Bus fares", "The public garage fee", "Taxi costs", "Fuel expenses"], answer: 1 },
+      { q: "How can employees be reimbursed?", options: ["Fill out an online form", "Submit receipts to the finance office", "Ask their manager", "Use a company card"], answer: 1 }
+    ]
+  },
+  {
+    title: "Training Workshop",
+    text: "A workshop on the company's new project-management software will be held on Wednesday, June 18, in Training Room A. Two identical sessions will be offered, one at 10 a.m. and another at 2 p.m., so that staff can choose the time that fits their schedule. Each session lasts about 90 minutes. Attendance is required for all project team members, but other employees are welcome to join if space allows. Please sign up on the shared calendar.",
+    questions: [
+      { q: "What is the workshop about?", options: ["A new email system", "New project-management software", "Office safety", "Customer service"], answer: 1 },
+      { q: "Why are two sessions offered?", options: ["The room is small", "So staff can choose a convenient time", "One is in another language", "The trainer is only available twice"], answer: 1 },
+      { q: "Who must attend?", options: ["All employees", "Project team members", "Only managers", "New hires"], answer: 1 }
+    ]
+  },
+  {
+    title: "Quarterly Results",
+    text: "Bright Star Retail reported strong results for the second quarter, with sales rising 12 percent compared with the same period last year. The company said the growth was driven mainly by its online store, which now accounts for nearly half of all sales. To meet rising demand, Bright Star plans to open two new distribution centers by the end of the year and to hire additional warehouse staff.",
+    questions: [
+      { q: "How did sales change compared with last year?", options: ["They fell 12 percent", "They rose 12 percent", "They stayed the same", "They doubled"], answer: 1 },
+      { q: "What mainly drove the growth?", options: ["New stores", "The online store", "Lower prices", "Advertising"], answer: 1 },
+      { q: "What does the company plan to do?", options: ["Close some stores", "Open two new distribution centers", "Reduce staff", "Raise prices"], answer: 1 }
+    ]
+  },
+  {
+    title: "Store Opening",
+    text: "Grand Opening!\n\nFreshMart is excited to open its newest store on Elm Avenue this Saturday at 9 a.m. To celebrate, the first 100 customers will receive a free reusable shopping bag, and all fresh produce will be sold at half price for the entire opening weekend. Members of our loyalty program will earn double points on all purchases. Come early to enjoy free samples and a chance to win a $100 gift card.",
+    questions: [
+      { q: "What will the first 100 customers receive?", options: ["A gift card", "A free reusable shopping bag", "A discount coupon", "Free coffee"], answer: 1 },
+      { q: "What is on sale during the opening weekend?", options: ["Electronics", "Fresh produce at half price", "Clothing", "Furniture"], answer: 1 },
+      { q: "What benefit do loyalty members get?", options: ["Free parking", "Double points on purchases", "A free membership", "Priority checkout"], answer: 1 }
+    ]
+  },
+  {
+    title: "Flight Schedule Change",
+    text: "Dear Passenger,\n\nWe are writing to inform you that the departure time of your flight to Singapore on May 9 has been changed from 8:15 a.m. to 10:45 a.m. due to operational reasons. Your seat assignment remains the same. Please arrive at the airport at least two hours before the new departure time. If the new schedule does not suit you, you may rebook to another flight at no extra cost by contacting our customer service line.",
+    questions: [
+      { q: "What has changed about the flight?", options: ["The destination", "The departure time", "The seat assignment", "The airline"], answer: 1 },
+      { q: "What should the passenger do about arrival time?", options: ["Arrive two hours before the new time", "Arrive one hour early", "Arrive at 8:15 a.m.", "Check in online only"], answer: 0 },
+      { q: "What option is offered if the schedule is unsuitable?", options: ["A full refund only", "Free rebooking to another flight", "A hotel voucher", "A meal coupon"], answer: 1 }
+    ]
+  },
+  {
+    title: "Library Membership",
+    text: "The Downtown Community Library invites residents to sign up for a free membership. Members can borrow up to ten books at a time for three weeks and access thousands of e-books and audiobooks online. The library also offers free workshops on résumé writing and computer skills every month. To register, bring a photo ID and proof of address to the front desk. Registration takes only a few minutes.",
+    questions: [
+      { q: "How many books can a member borrow at once?", options: ["Five", "Ten", "Fifteen", "Twenty"], answer: 1 },
+      { q: "What free workshops does the library offer?", options: ["Cooking and art", "Résumé writing and computer skills", "Music and dance", "Language classes"], answer: 1 },
+      { q: "What is needed to register?", options: ["A membership fee", "A photo ID and proof of address", "A library card number", "A reference letter"], answer: 1 }
+    ]
   }
 ];

@@ -105,10 +105,12 @@ const FSRS = {
   },
 
   /**
-   * 使用者對這張單字卡評分(1-4,對應忘記/困難/記得/簡單),回傳更新後的 patch,
-   * 並直接寫回 DataStore。
+   * 使用者對這張卡評分(1-4,對應忘記/困難/記得/簡單),回傳更新後的 patch,並直接寫回 DataStore。
+   * 預設寫回 vocab_items;語塊卡(chunk_items)可傳 options.persist 改寫回 chunkItems
+   * (兩者的 srs_* 欄位結構相同,見 data-store.js)。
    */
   review(vocabItem, grade, options = {}) {
+    const persist = options.persist || ((id, patch) => DataStore.updateVocabItem(id, patch));
     const now = options.now || new Date();
     const desiredRetention = options.desiredRetention || DEFAULT_DESIRED_RETENTION;
     const isNew = !vocabItem.srs_last_review;
@@ -145,6 +147,6 @@ const FSRS = {
       error_count: vocabItem.error_count + (grade === FSRS.GRADE.AGAIN ? 1 : 0)
     };
 
-    return DataStore.updateVocabItem(vocabItem.id, patch);
+    return persist(vocabItem.id, patch);
   }
 };

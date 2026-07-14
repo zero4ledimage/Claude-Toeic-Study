@@ -17,7 +17,7 @@
  * 這是需求文件 4.5 節本身註明「草案,待細化」下的合理擴充,不是偏離規格。
  */
 
-const COLLECTIONS = ["vocabItems", "errorLog", "progressRecords", "studySessions", "apiUsageDailyCache"];
+const COLLECTIONS = ["vocabItems", "errorLog", "progressRecords", "studySessions", "apiUsageDailyCache", "chunkItems"];
 
 const STORAGE_PREFIX = "tls_"; // toeic-ielts-study
 
@@ -42,9 +42,10 @@ const state = {
   progressRecords: [],
   studySessions: [],
   apiUsageDailyCache: [],
+  chunkItems: [],
   meta: {
     // 每個 collection 各自的最後更新時間,DriveSync 用來判斷本地/雲端哪份較新
-    updatedAt: { vocabItems: null, errorLog: null, progressRecords: null, studySessions: null, apiUsageDailyCache: null }
+    updatedAt: { vocabItems: null, errorLog: null, progressRecords: null, studySessions: null, apiUsageDailyCache: null, chunkItems: null }
   }
 };
 
@@ -204,6 +205,51 @@ const DataStore = {
   },
   getStudySessionsForDate(dateStr) {
     return state.studySessions.filter((s) => s.date === dateStr);
+  },
+
+  // ---------- chunk_items(語塊/搭配詞,需求文件 3.11 節) ----------
+  addChunkItem({ chunk_text, chunk_type, core_word, common_variants, core_image_note, source_sentence, vocab_tier }) {
+    const existing = state.chunkItems.find(
+      (c) => c.chunk_text.toLowerCase() === (chunk_text || "").toLowerCase()
+    );
+    if (existing) return existing; // 避免重複加入同一個語塊
+    const item = {
+      id: uid(),
+      chunk_text: chunk_text || "",
+      chunk_type: chunk_type || "collocation", // collocation / phrasal_verb / idiom / sentence_pattern
+      core_word: core_word || "",
+      common_variants: common_variants || [],
+      core_image_note: core_image_note || null,
+      source_sentence: source_sentence || "",
+      vocab_tier: vocab_tier || "core_3000",
+      srs_due_date: nowIso(),
+      srs_interval: 0,
+      error_count: 0,
+      srs_stability: 0,
+      srs_difficulty: 0,
+      srs_reps: 0,
+      srs_lapses: 0,
+      srs_state: 0,
+      srs_last_review: null,
+      created_at: nowIso()
+    };
+    state.chunkItems.push(item);
+    touch("chunkItems");
+    return item;
+  },
+  updateChunkItem(id, patch) {
+    const item = state.chunkItems.find((c) => c.id === id);
+    if (!item) return null;
+    Object.assign(item, patch);
+    touch("chunkItems");
+    return item;
+  },
+  removeChunkItem(id) {
+    state.chunkItems = state.chunkItems.filter((c) => c.id !== id);
+    touch("chunkItems");
+  },
+  getDueChunkItems(now = new Date()) {
+    return state.chunkItems.filter((c) => new Date(c.srs_due_date) <= now);
   },
 
   // ---------- api_usage_daily(快取 Worker /budget/status 的回傳結果,供離線繪圖) ----------

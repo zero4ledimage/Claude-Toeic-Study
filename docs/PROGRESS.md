@@ -1,4 +1,4 @@
-# 開發進度(2026-07-10 更新)
+# 開發進度(2026-07-14 更新)
 
 ## Phase 1 功能完成狀態
 
@@ -13,6 +13,8 @@
 | 7 | API 預算控管與開銷視覺化(3.9) | ✅ 完成 | `worker/src/index.js`(記錄與門檻)、`js/dashboard.js`(視覺化) |
 | 8 | 寫作批改沙盒/口說模組輕量版(3.3/3.4) | ✅ 完成 | `js/writing-sandbox.js`、`js/speaking.js` |
 | 9 | 多益模擬考排程(2.4/3.6) | ✅ 完成 | `js/mock-schedule.js` |
+| 10 | 測驗練習模組・邊測邊學(3.10) | ✅ 完成 | `js/practice.js`、`js/practice-bank.js` |
+| 11 | 語塊與搭配詞強化學習(3.11) | ✅ 完成 | `js/chunks.js`、`js/word-tier.js`,擴充 `js/vocab-lookup.js`/`js/vocab-review.js`/`js/writing-sandbox.js`;`chunk_items` 已入 `js/data-store.js`、`js/drive-sync.js` |
 
 ## 基礎架構
 
@@ -28,6 +30,8 @@
 
 - **KK 音標轉換**:ECDICT 音標是英式且記法不一致,規則式轉換無法百分之百精準。已處理字尾兒化、BATH/TRAP 分流、NEAR/SQUARE/CURE 雙母音;**非重音非字尾的 r 化母音**(如 perceive 第一音節、order/market 的字中 r)無法靠規則補回,維持無 r 版本。
 - **FSRS 參數**:核心數學模型(stability/difficulty/retrievability 冪律遺忘曲線)完整實作,但初始權重是合理預設值,非 Anki 官方機器學習優化後的數字。
+- **詞彙分級(3.11 功能一)**:Oxford 3000/5000 官方 CSV 尚未匯入,`js/word-tier.js` 先內建一份高頻核心字集合作近似,涵蓋率有限;把 Oxford 清單放進 `data/open-content/` 再改由檔案載入即可提升準確度,`classify()` 介面不變。
+- **測驗練習估分(3.10)**:本地原創題庫未經官方難度校準,週末模考的分數是粗略換算,已於 UI 與儀表板明確標示「非官方分數」,真正校準仍需官方紙本模擬考。
 - **口說模組**:STT+LLM 只能評內容組織,評不了發音/流利度(需求文件 3.4 已載明)。
 - **官方題庫**:版權限制不可匯入,錯題採手動謄寫(2.3)。
 

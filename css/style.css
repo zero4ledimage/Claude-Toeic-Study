@@ -293,3 +293,8 @@ textarea { resize: vertical; }
 .pr-fb p { margin: 0.15rem 0; }
 .pr-navrow { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.9rem; }
 .pr-navrow .btn-primary, .pr-navrow .btn-secondary { margin-top: 0; }
+
+/* 語塊(3.11):選取片語彈出框與複習卡種類標記 */
+.chunk-action { max-width: 260px; }
+.chunk-action .ca-type { margin-bottom: 0.4rem; }
+.rc-kind { font-size: 0.75rem; color: #fff; background: var(--primary); border-radius: 999px; padding: 0.1rem 0.5rem; }

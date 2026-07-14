@@ -17,7 +17,7 @@
  * 這是需求文件 4.5 節本身註明「草案,待細化」下的合理擴充,不是偏離規格。
  */
 
-const COLLECTIONS = ["vocabItems", "errorLog", "progressRecords", "studySessions", "apiUsageDailyCache", "chunkItems"];
+const COLLECTIONS = ["vocabItems", "errorLog", "progressRecords", "studySessions", "apiUsageDailyCache", "chunkItems", "generatedItems"];
 
 const STORAGE_PREFIX = "tls_"; // toeic-ielts-study
 
@@ -43,9 +43,10 @@ const state = {
   studySessions: [],
   apiUsageDailyCache: [],
   chunkItems: [],
+  generatedItems: [],
   meta: {
     // 每個 collection 各自的最後更新時間,DriveSync 用來判斷本地/雲端哪份較新
-    updatedAt: { vocabItems: null, errorLog: null, progressRecords: null, studySessions: null, apiUsageDailyCache: null, chunkItems: null }
+    updatedAt: { vocabItems: null, errorLog: null, progressRecords: null, studySessions: null, apiUsageDailyCache: null, chunkItems: null, generatedItems: null }
   }
 };
 
@@ -250,6 +251,21 @@ const DataStore = {
   },
   getDueChunkItems(now = new Date()) {
     return state.chunkItems.filter((c) => new Date(c.srs_due_date) <= now);
+  },
+
+  // ---------- generated_items(AI 生成的練習題,需求文件 3.10.3) ----------
+  addGeneratedItem({ type, payload }) {
+    const item = { id: uid(), type, payload, created_at: nowIso() }; // type: grammar / reading
+    state.generatedItems.push(item);
+    touch("generatedItems");
+    return item;
+  },
+  getGeneratedItems(type) {
+    return state.generatedItems.filter((g) => !type || g.type === type);
+  },
+  removeGeneratedItem(id) {
+    state.generatedItems = state.generatedItems.filter((g) => g.id !== id);
+    touch("generatedItems");
   },
 
   // ---------- api_usage_daily(快取 Worker /budget/status 的回傳結果,供離線繪圖) ----------

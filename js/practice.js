@@ -94,7 +94,30 @@ const Practice = {
         </div>
         <div id="pr-mock-history"></div>
       </div>
+
+      <div class="card">
+        <h2>AI 生成題目(擴充題庫)</h2>
+        <p class="muted">用 Claude Haiku 依你的弱點原創新題,存進題庫、同步到你的 Google Drive,可以一直累積。需登入,會計入 AI 預算(低頻、受門檻管)。目前題庫:文法 ${PRACTICE_GRAMMAR.length + DataStore.getGeneratedItems("grammar").length} 題、閱讀 ${PRACTICE_READING.length + DataStore.getGeneratedItems("reading").length} 篇。</p>
+        <div class="field-inline">
+          <select id="pr-gen-type">
+            <option value="grammar">文法題</option>
+            <option value="reading">閱讀短文(每篇3題)</option>
+          </select>
+          <select id="pr-gen-count">
+            <option value="5" selected>5 個</option>
+            <option value="10">10 個</option>
+          </select>
+          <button class="btn-primary" id="pr-gen-btn">生成並加入題庫</button>
+        </div>
+        <div id="pr-gen-status" class="muted"></div>
+      </div>
     `;
+
+    this.container.querySelector("#pr-gen-btn").addEventListener("click", () => {
+      const type = this.container.querySelector("#pr-gen-type").value;
+      const count = parseInt(this.container.querySelector("#pr-gen-count").value, 10);
+      this._generateQuestions(type, count);
+    });
 
     this.container.querySelector("#pr-start-drill").addEventListener("click", () => {
       const type = this.container.querySelector("#pr-drill-type").value;
@@ -188,7 +211,9 @@ const Practice = {
   },
 
   _buildGrammarQuestions(n) {
-    return prShuffle(PRACTICE_GRAMMAR).slice(0, n).map((q) => ({
+    const generated = DataStore.getGeneratedItems("grammar").map((g) => g.payload);
+    const bank = PRACTICE_GRAMMAR.concat(generated);
+    return prShuffle(bank).slice(0, n).map((q) => ({
       type: "grammar",
       prompt: q.sentence,
       subPrompt: "選出最適合填入空格的選項",
@@ -201,9 +226,10 @@ const Practice = {
   },
 
   _buildReadingQuestions(n) {
-    // 展開所有 (passage, question) 組合再抽樣
+    // 展開所有 (passage, question) 組合再抽樣(內建 + AI 生成)
     const all = [];
-    PRACTICE_READING.forEach((p) => {
+    const generated = DataStore.getGeneratedItems("reading").map((g) => g.payload);
+    PRACTICE_READING.concat(generated).forEach((p) => {
       p.questions.forEach((q) => {
         all.push({
           type: "reading",
@@ -527,6 +553,100 @@ const Practice = {
       });
       if (item) FSRS.review(item, FSRS.GRADE.AGAIN);
     }
+  },
+
+  // ---------------- AI 生成題庫(需求文件 3.10.3) ----------------
+  async _generateQuestions(type, count) {
+    const statusEl = this.container.querySelector("#pr-gen-status");
+    const btn = this.container.querySelector("#pr-gen-btn");
+    btn.disabled = true;
+    statusEl.textContent = "生成中,請稍候…(AI 出題約需十幾秒)";
+    const weak = DataStore.getWeaknessStats().slice(0, 2).map((s) => s.category).join("、");
+    const weakHint = weak ? `請盡量針對這位考生較弱的方向出題:${weak}。` : "";
+    try {
+      const messages = type === "grammar" ? this._grammarGenMessages(count, weakHint) : this._readingGenMessages(count, weakHint);
+      const resp = await ApiClient.callClaude({
+        model: CONFIG.MODELS.HAIKU,
+        maxTokens: type === "reading" ? 2200 : 1400,
+        system: "你是多益(TOEIC)出題老師,只出原創題,嚴禁抄襲或重製 ETS 官方題。只輸出 JSON 陣列,不要任何多餘文字或說明。",
+        messages
+      });
+      const arr = this._parseJsonArray(ApiClient.extractText(resp));
+      if (!arr) throw new Error("AI 回傳格式無法解析,請再試一次。");
+      let added = 0, skipped = 0;
+      arr.forEach((item) => {
+        const valid = type === "grammar" ? this._validGrammar(item) : this._validReading(item);
+        if (valid) { DataStore.addGeneratedItem({ type, payload: valid }); added++; } else skipped++;
+      });
+      const unit = type === "grammar" ? "題" : "篇";
+      statusEl.textContent = `已加入 ${added} ${unit}${skipped ? `(${skipped} 個格式不符已略過)` : ""}。題庫已更新,可直接開始練習。`;
+    } catch (err) {
+      statusEl.textContent = err.needsSignIn
+        ? "登入 Google 帳號後才能使用 AI 生成。"
+        : err.budgetExceeded
+        ? "本月 AI 預算已達上限,無法生成。"
+        : (err.message || "生成失敗,請稍後再試。");
+    } finally {
+      btn.disabled = false;
+    }
+  },
+
+  _grammarGenMessages(count, weakHint) {
+    return [{
+      role: "user",
+      content:
+        `請原創 ${count} 題多益 Part 5 風格的單句文法選擇題。${weakHint}\n` +
+        "每題有一個空格,用四個底線 ____ 表示。務必確認:把正解填入 ____ 之後,整句英文文法完全正確、語意通順," +
+        '且不會出現重複字詞(例如不要讓句子裡的 "____ of" 搭配 "because of" 而變成 "because of of")。\n' +
+        '只輸出 JSON 陣列,每個元素格式:{"sentence":"含 ____ 的句子","options":["A","B","C","D"],' +
+        '"answer":正解索引(0到3的整數),"explanation":"繁體中文詳解","category":"tense|preposition|conjunction|relative|wordform|subjectverb 擇一"}'
+    }];
+  },
+
+  _readingGenMessages(count, weakHint) {
+    return [{
+      role: "user",
+      content:
+        `請原創 ${count} 篇多益 Part 7 風格英文短文,每篇 80-130 字,主題為職場/商務情境(通知、email、廣告、文章等)。${weakHint}\n` +
+        "每篇搭配 3 題單選理解題。只輸出 JSON 陣列,每個元素格式:" +
+        '{"title":"短標題","text":"英文短文","questions":[{"q":"問題","options":["A","B","C","D"],"answer":正解索引(0到3)}]}'
+    }];
+  },
+
+  _parseJsonArray(text) {
+    const m = text && text.match(/\[[\s\S]*\]/);
+    if (!m) return null;
+    try {
+      const a = JSON.parse(m[0]);
+      return Array.isArray(a) ? a : null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  _validGrammar(item) {
+    if (!item || typeof item.sentence !== "string" || !/_{2,}/.test(item.sentence)) return null;
+    if (!Array.isArray(item.options) || item.options.length !== 4) return null;
+    const a = Number(item.answer);
+    if (!Number.isInteger(a) || a < 0 || a > 3) return null;
+    return {
+      sentence: item.sentence, options: item.options.map(String), answer: a,
+      explanation: String(item.explanation || ""), category: String(item.category || "generated")
+    };
+  },
+
+  _validReading(item) {
+    if (!item || typeof item.text !== "string" || !item.text.trim()) return null;
+    if (!Array.isArray(item.questions) || item.questions.length === 0) return null;
+    const qs = [];
+    item.questions.forEach((q) => {
+      if (!q || typeof q.q !== "string" || !Array.isArray(q.options) || q.options.length !== 4) return;
+      const a = Number(q.answer);
+      if (!Number.isInteger(a) || a < 0 || a > 3) return;
+      qs.push({ q: q.q, options: q.options.map(String), answer: a });
+    });
+    if (qs.length === 0) return null;
+    return { title: String(item.title || "AI 短文"), text: item.text, questions: qs };
   },
 
   _typeLabel(t) {

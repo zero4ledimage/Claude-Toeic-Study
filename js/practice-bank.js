@@ -113,7 +113,7 @@ const PRACTICE_GRAMMAR = [
   { category: "preposition", sentence: "According ____ the report, sales rose ten percent.", options: ["with", "to", "for", "at"], answer: 1, explanation: "according to 為固定片語,意為「根據」。" },
   { category: "conjunction", sentence: "____ the flight was delayed, passengers received vouchers.", options: ["Because", "Despite", "Although", "So"], answer: 0, explanation: "Because 後接完整子句表示原因。" },
   { category: "conjunction", sentence: "The report was well received ____ it contained several errors.", options: ["although", "because", "so", "and"], answer: 0, explanation: "although 表示讓步,「儘管有錯,仍受好評」。" },
-  { category: "conjunction", sentence: "The workshop was canceled ____ of low registration.", options: ["because", "because of", "although", "despite"], answer: 1, explanation: "because of + 名詞片語(low registration)表示原因。" },
+  { category: "conjunction", sentence: "The workshop was canceled ____ low registration.", options: ["because", "because of", "although", "despite"], answer: 1, explanation: "because of + 名詞片語(low registration)表示原因;because/although 後面要接完整子句,不能直接接名詞片語。" },
   { category: "conjunction", sentence: "Neither the manager ____ the assistant was available.", options: ["or", "nor", "and", "but"], answer: 1, explanation: "neither...nor... 為固定搭配。" },
   { category: "conjunction", sentence: "The company raised its budget ____ boost sales this quarter.", options: ["so that", "in order to", "because", "although"], answer: 1, explanation: "in order to + 原形動詞,表示目的。" },
   { category: "relative", sentence: "The employee ____ résumé impressed the manager was hired.", options: ["who", "whom", "whose", "which"], answer: 2, explanation: "空格後接名詞 résumé,用所有格關係代名詞 whose。" },

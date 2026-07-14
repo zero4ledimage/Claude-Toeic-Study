@@ -4,6 +4,7 @@
 
 const TABS = [
   { id: "dashboard", mount: (el) => Dashboard.mount(el) },
+  { id: "practice", mount: (el) => Practice.mount(el) },
   { id: "vocab", mount: (el) => VocabReview.mount(el) },
   { id: "decomposer", mount: (el) => Decomposer.mount(el) },
   { id: "error-log", mount: (el) => ErrorLog.mount(el) },

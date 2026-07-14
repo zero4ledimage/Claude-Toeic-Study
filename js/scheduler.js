@@ -10,7 +10,7 @@ const SLOT_ACTIVITIES = {
   weekday_fragment: {
     label: "週間白天零碎時段",
     hint: "5-20 分鐘的空檔,適合高頻率、可以隨時中斷的活動。",
-    activities: [{ label: "FSRS 到期單字複習", tab: "vocab" }, { label: "單字互動查詢", tab: "vocab" }]
+    activities: [{ label: "每日練功(做題學習)", tab: "practice" }, { label: "FSRS 到期單字複習", tab: "vocab" }]
   },
   weekday_evening: {
     label: "週間晚上完整時段",
@@ -24,6 +24,7 @@ const SLOT_ACTIVITIES = {
     label: "週末完整時段",
     hint: "2-3 小時的完整時間,適合模考與弱點回顧。",
     activities: [
+      { label: "週末模考(計時估分)", tab: "practice" },
       { label: "官方真題模擬考排程", tab: "mock-schedule" },
       { label: "寫作批改沙盒完整練習", tab: "writing" },
       { label: "口說完整練習", tab: "speaking" },

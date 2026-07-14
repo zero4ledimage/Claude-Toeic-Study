@@ -138,6 +138,15 @@ const Dashboard = {
       });
       html += `</div>`;
     }
+    const selfRecords = DataStore.getAll("progressRecords")
+      .filter((r) => r.source === "self_practice" && r.test_type === "toeic")
+      .slice(-5)
+      .reverse();
+    if (selfRecords.length) {
+      html += `<div class="target-path-summary" style="margin-top:0.6rem;">本地練習模考估分(僅供參考、<strong>非官方分數</strong>,詳見「測驗練習」分頁):<br>${selfRecords
+        .map((r) => `${escapeHtml(r.date)}:閱讀約 ${escapeHtml(String(r.score))}/495`)
+        .join("；")}</div>`;
+    }
     el.innerHTML = html;
   },
 

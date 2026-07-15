@@ -290,6 +290,40 @@ Claude不能複製或重製ETS、劍橋雅思的原題(版權限制),只能生�
 
 （此表同步列於4.5節整體資料模型)
 
+### 3.12 影片逐字稿匯入學習與出題
+
+**設計動機**:使用者有觀看 YouTube 英文訪談/演講的習慣,希望把這些自己感興趣的真實內容變成學習與測驗素材,提高動機與情境相關性。
+
+**版權與取得方式(比照 2.3 節的謹慎立場)**:
+- **不自動抓取 YouTube**(違反 YouTube 服務條款,純前端技術上也做不到;YouTube Data API 只允許影片擁有者本人下載字幕)。
+- 由使用者**手動取得逐字稿後貼上**:使用者的流程是先把內容貼進 NotebookLM 整理,再把整理後的逐字稿複製貼進本工具。
+- 屬**個人學習用途**,產生的資料(含逐字稿原文)只存進使用者**自己的私有 Google Drive**,不對外散布。
+
+#### 功能一:逐字稿匯入
+- 輸入介面:填「來源標題」(如影片名)+ 貼上**完整逐字稿**(不強制分段、可貼長文)。
+- 逐字稿原文一併儲存(見資料模型 `source_texts`),供之後複習與作為理解題的閱讀段落。
+- 預估用量:每週 4 篇以內;成本受 3.9 節門檻管控(實測單篇約數美分,遠低於使用者可接受的 USD20/月)。
+
+#### 功能二:單字/語塊學習(沿用 3.2 拆解器 + 3.11 語塊)
+- 從逐字稿抽出核心單字與搭配詞/語塊 → 進 FSRS 複習佇列(3.1),使用 Haiku 4.5。
+- 每個項目標記**來源(影片標題)**。
+
+#### 功能三:依逐字稿出測驗題(沿用 3.10.3 生成機制)
+- 出題型別(全部):**理解題(主旨/細節)、單字在情境中的意思、克漏字填空**。
+- **模型分工**:理解題(需推論、掌握主旨)用 **Sonnet 5**;單字在情境、克漏字用 **Haiku 4.5**。
+- 生成題目存入題庫、可在「測驗練習」作答;每題標記**來源(影片標題)**。
+
+#### 功能四:依來源分類回顧
+- 可依「影片標題」篩選/瀏覽該來源產生的單字與題目,並可直接就該來源做一組練習。
+
+#### 明確不做
+- App 內播放影片/音檔、真正的聽力音訊測驗(目前聽力不採用 YouTube 內容,本功能為**純文本**學習與出題)。
+- 自動下載/爬取 YouTube。
+
+#### 資料模型調整
+- 新增 `source_texts`(儲存逐字稿原文,見 4.5 節)。
+- `generated_items`、`vocab_items`、`chunk_items` 各加一個 `source_label` 欄位(記錄影片標題),供功能四分類。
+
 ---
 
 ### 4.1 整體架構
@@ -341,8 +375,11 @@ Claude不能複製或重製ETS、劍橋雅思的原題(版權限制),只能生�
 - progress_records: {id, date, test_type(toeic/ielts), skill(reading/listening/writing/speaking), score, source(official_mock/self_practice)}
 - study_sessions: {id, date, duration_minutes, time_slot_type(weekday_fragment/weekday_evening/weekend), phase(1/2), skill_focus}
 - api_usage_daily: {date, model(sonnet-5/haiku-4-5), input_tokens, output_tokens, estimated_cost_usd}
-- chunk_items: {id, chunk_text, chunk_type(collocation/phrasal_verb/idiom/sentence_pattern), core_word, common_variants, core_image_note(optional), source_sentence, vocab_tier(core_3000/extended_7000), srs_due_date, srs_interval, error_count}  // 見3.11節
+- chunk_items: {id, chunk_text, chunk_type(collocation/phrasal_verb/idiom/sentence_pattern), core_word, common_variants, core_image_note(optional), source_sentence, vocab_tier(core_3000/extended_7000), srs_due_date, srs_interval, error_count, source_label(optional)}  // 見3.11節;source_label 見3.12節
+- generated_items: {id, type(grammar/reading), payload, source_label(optional), created_at}  // AI 生成題,見3.10.3/3.12節
+- source_texts: {id, source_label, text, created_at}  // 影片逐字稿原文,見3.12節
 ```
+(vocab_items 亦新增 source_label 選填欄位,記錄來源影片標題,見 3.12 節)
 
 ---
 
@@ -350,7 +387,7 @@ Claude不能複製或重製ETS、劍橋雅思的原題(版權限制),只能生�
 
 | 階段 | 時間 | 開發重點 |
 |---|---|---|
-| Phase 1 | 2026年7-12月 | 閱讀拆解器、FSRS引擎、聽力模組、錯題本、Google Drive串接、Cloudflare Workers中介層、API預算控管與開銷視覺化(3.9節)、單字互動查詢(3.7節)、進度追蹤儀表板(3.6節)、情境化學習排程(3.8節)、**輕量版**寫作批改沙盒與口說模組、多益模擬考排程、**測驗練習模組(邊測邊學,3.10節)**、**語塊與搭配詞強化學習(3.11節)** |
+| Phase 1 | 2026年7-12月 | 閱讀拆解器、FSRS引擎、聽力模組、錯題本、Google Drive串接、Cloudflare Workers中介層、API預算控管與開銷視覺化(3.9節)、單字互動查詢(3.7節)、進度追蹤儀表板(3.6節)、情境化學習排程(3.8節)、**輕量版**寫作批改沙盒與口說模組、多益模擬考排程、**測驗練習模組(邊測邊學,3.10節)**、**語塊與搭配詞強化學習(3.11節)**、**影片逐字稿匯入學習與出題(3.12節)** |
 | 決策點 | 2026年12月底-2027年1月 | 確認多益成績,決定是否進入Phase 2 |
 | Phase 2 | 2027年1-9月 | **強化**寫作批改沙盒(Task 1/Task 2分流)、**強化**口說模組(補完整AI評語邏輯)、雅思模擬考排程 |
 | 待評估 | 視需求 | 口說發音/流利度音訊分析(目前STT+LLM方案有已知限制) |
@@ -371,6 +408,8 @@ Claude不能複製或重製ETS、劍橋雅思的原題(版權限制),只能生�
 - [x] Phase 1期間保留「每日15-20分鐘口說寫作維持劑量」的小習慣(見1.2、1.3節)
 - [x] 新增測驗練習模組(邊測邊學,3.10節):平日每日練功(可中斷續做)+ 週末計時模考(可分段);題目用本地原創題庫/AI生成,不用官方版權題
 - [x] 新增語塊與搭配詞強化學習(3.11節):FSRS複習納入搭配詞/語塊,核心3000字生成語塊卡片,寫作批改加搭配詞自然度檢查
+
+- [x] 新增影片逐字稿匯入(3.12節):使用者手動貼上(NotebookLM 整理後的)逐字稿,原文存進私有 Drive;抽單字/語塊(Haiku)+ 出理解題(Sonnet)/單字情境題與克漏字(Haiku),依影片標題分類;不做 App 內播放與自動抓取 YouTube
 
 **仍待確認**:(目前無)
 

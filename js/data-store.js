@@ -17,7 +17,7 @@
  * 這是需求文件 4.5 節本身註明「草案,待細化」下的合理擴充,不是偏離規格。
  */
 
-const COLLECTIONS = ["vocabItems", "errorLog", "progressRecords", "studySessions", "apiUsageDailyCache", "chunkItems", "generatedItems"];
+const COLLECTIONS = ["vocabItems", "errorLog", "progressRecords", "studySessions", "apiUsageDailyCache", "chunkItems", "generatedItems", "sourceTexts"];
 
 const STORAGE_PREFIX = "tls_"; // toeic-ielts-study
 
@@ -44,9 +44,10 @@ const state = {
   apiUsageDailyCache: [],
   chunkItems: [],
   generatedItems: [],
+  sourceTexts: [],
   meta: {
     // 每個 collection 各自的最後更新時間,DriveSync 用來判斷本地/雲端哪份較新
-    updatedAt: { vocabItems: null, errorLog: null, progressRecords: null, studySessions: null, apiUsageDailyCache: null, chunkItems: null, generatedItems: null }
+    updatedAt: { vocabItems: null, errorLog: null, progressRecords: null, studySessions: null, apiUsageDailyCache: null, chunkItems: null, generatedItems: null, sourceTexts: null }
   }
 };
 
@@ -108,7 +109,7 @@ const DataStore = {
   },
 
   // ---------- vocab_items ----------
-  addVocabItem({ word, phonetic, definition, source_sentence, source_type, ai_context_note }) {
+  addVocabItem({ word, phonetic, definition, source_sentence, source_type, ai_context_note, source_label }) {
     const existing = state.vocabItems.find((v) => v.word.toLowerCase() === word.toLowerCase());
     if (existing) return existing; // 避免重複加入同一個單字
     const item = {
@@ -118,6 +119,7 @@ const DataStore = {
       definition: definition || "",
       source_sentence: source_sentence || "",
       source_type: source_type || "manual", // reading_test / listening_test / manual
+      source_label: source_label || null, // 來源影片標題(3.12)
       ai_context_note: ai_context_note || null,
       srs_due_date: nowIso(),
       srs_interval: 0,
@@ -209,7 +211,7 @@ const DataStore = {
   },
 
   // ---------- chunk_items(語塊/搭配詞,需求文件 3.11 節) ----------
-  addChunkItem({ chunk_text, chunk_type, core_word, common_variants, core_image_note, source_sentence, vocab_tier }) {
+  addChunkItem({ chunk_text, chunk_type, core_word, common_variants, core_image_note, source_sentence, vocab_tier, source_label }) {
     const existing = state.chunkItems.find(
       (c) => c.chunk_text.toLowerCase() === (chunk_text || "").toLowerCase()
     );
@@ -222,6 +224,7 @@ const DataStore = {
       common_variants: common_variants || [],
       core_image_note: core_image_note || null,
       source_sentence: source_sentence || "",
+      source_label: source_label || null, // 來源影片標題(3.12)
       vocab_tier: vocab_tier || "core_3000",
       srs_due_date: nowIso(),
       srs_interval: 0,
@@ -253,15 +256,32 @@ const DataStore = {
     return state.chunkItems.filter((c) => new Date(c.srs_due_date) <= now);
   },
 
-  // ---------- generated_items(AI 生成的練習題,需求文件 3.10.3) ----------
-  addGeneratedItem({ type, payload }) {
-    const item = { id: uid(), type, payload, created_at: nowIso() }; // type: grammar / reading
+  // ---------- generated_items(AI 生成的練習題,需求文件 3.10.3 / 3.12) ----------
+  addGeneratedItem({ type, payload, source_label }) {
+    const item = { id: uid(), type, payload, source_label: source_label || null, created_at: nowIso() }; // type: grammar / reading
     state.generatedItems.push(item);
     touch("generatedItems");
     return item;
   },
-  getGeneratedItems(type) {
-    return state.generatedItems.filter((g) => !type || g.type === type);
+  getGeneratedItems(type, source_label) {
+    return state.generatedItems.filter(
+      (g) => (!type || g.type === type) && (source_label === undefined || g.source_label === source_label)
+    );
+  },
+
+  // ---------- source_texts(影片逐字稿原文,需求文件 3.12) ----------
+  addSourceText({ source_label, text }) {
+    const item = { id: uid(), source_label: source_label || "(未命名)", text: text || "", created_at: nowIso() };
+    state.sourceTexts.push(item);
+    touch("sourceTexts");
+    return item;
+  },
+  getSourceTexts() {
+    return state.sourceTexts.slice();
+  },
+  removeSourceText(id) {
+    state.sourceTexts = state.sourceTexts.filter((s) => s.id !== id);
+    touch("sourceTexts");
   },
   removeGeneratedItem(id) {
     state.generatedItems = state.generatedItems.filter((g) => g.id !== id);

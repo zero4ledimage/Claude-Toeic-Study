@@ -37,10 +37,17 @@ function prCleanMeaning(raw) {
 const Practice = {
   session: null, // 進行中的一組題目(drill 或 mock)
   _timer: null,
+  pendingSource: null, // 由「影片素材」分頁設定,要求就某來源做一組練習(3.12 功能四)
 
   mount(container) {
     this.container = container;
     if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    if (this.pendingSource) {
+      const label = this.pendingSource;
+      this.pendingSource = null;
+      this._startSourceDrill(label);
+      return;
+    }
     this.session = this._loadSession();
     if (this.session && this.session.finished) { this._clearSession(); this.session = null; }
     if (this.session) {
@@ -274,6 +281,34 @@ const Practice = {
   },
   _clearSession() {
     localStorage.removeItem(PRACTICE_SESSION_KEY);
+  },
+
+  // 就某個來源(影片標題)生成的題目做一組練習(3.12 功能四)
+  _startSourceDrill(label) {
+    const gen = DataStore.getGeneratedItems(undefined, label);
+    const qs = [];
+    gen.forEach((g) => {
+      if (g.type === "grammar") {
+        const q = g.payload;
+        qs.push({ type: "grammar", prompt: q.sentence, subPrompt: "選出最適合填入空格的選項", passage: null, options: q.options.slice(), answer: q.answer, explanation: q.explanation || "", meta: { category: q.category } });
+      } else if (g.type === "reading") {
+        const p = g.payload;
+        (p.questions || []).forEach((q) => {
+          qs.push({ type: "reading", prompt: q.q, subPrompt: "閱讀短文後作答", passage: { title: p.title, text: p.text }, options: q.options.slice(), answer: q.answer, explanation: "", meta: {} });
+        });
+      }
+    });
+    if (qs.length === 0) {
+      alert("這個來源還沒有生成題目,請先到「影片素材」分頁生成。");
+      this.renderHome();
+      return;
+    }
+    this.session = {
+      mode: "drill", type: "source", sourceLabel: label, index: 0, questions: prShuffle(qs),
+      answers: new Array(qs.length).fill(null), finished: false, startedAt: new Date().toISOString()
+    };
+    this._saveSession();
+    this._renderDrillQuestion();
   },
 
   // ================= 每日練功 =================

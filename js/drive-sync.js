@@ -17,7 +17,8 @@ const DRIVE_FILES = {
   studySessions: "study_sessions.json",
   apiUsageDailyCache: "api_usage_daily_cache.json",
   chunkItems: "chunk_items.json",
-  generatedItems: "generated_items.json"
+  generatedItems: "generated_items.json",
+  sourceTexts: "source_texts.json"
 };
 
 let gisLoadedPromise = null;

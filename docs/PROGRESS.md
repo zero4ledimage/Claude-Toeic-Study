@@ -15,6 +15,7 @@
 | 9 | 多益模擬考排程(2.4/3.6) | ✅ 完成 | `js/mock-schedule.js` |
 | 10 | 測驗練習模組・邊測邊學(3.10) | ✅ 完成 | `js/practice.js`、`js/practice-bank.js` |
 | 11 | 語塊與搭配詞強化學習(3.11) | ✅ 完成 | `js/chunks.js`、`js/word-tier.js`,擴充 `js/vocab-lookup.js`/`js/vocab-review.js`/`js/writing-sandbox.js`;`chunk_items` 已入 `js/data-store.js`、`js/drive-sync.js` |
+| 12 | 影片逐字稿匯入學習與出題(3.12) | ✅ 完成 | `js/video-import.js`;`source_texts` 與 `source_label` 已入 `js/data-store.js`/`js/drive-sync.js`;`js/practice.js` 支援依來源做題。單字/語塊(Haiku)、理解題(Sonnet)、單字情境+克漏字(Haiku),依來源標記 |
 
 ## 基礎架構
 

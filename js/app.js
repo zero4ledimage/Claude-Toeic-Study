@@ -7,6 +7,7 @@ const TABS = [
   { id: "practice", mount: (el) => Practice.mount(el) },
   { id: "vocab", mount: (el) => VocabReview.mount(el) },
   { id: "decomposer", mount: (el) => Decomposer.mount(el) },
+  { id: "video-import", mount: (el) => VideoImport.mount(el) },
   { id: "error-log", mount: (el) => ErrorLog.mount(el) },
   { id: "writing", mount: (el) => WritingSandbox.mount(el) },
   { id: "speaking", mount: (el) => SpeakingModule.mount(el) },
